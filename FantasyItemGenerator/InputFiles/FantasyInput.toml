@@ -1,0 +1,75 @@
+[settings]
+tags = ["material", "metal", "battle", "noble", "wood", "stone", "animal product", "animal", "building"]
+
+[[dictionary]]
+name = "copper"
+tags = ["material", "metal", "battle"]
+
+[[dictionary]]
+name = "lead"
+tags = ["material", "metal"]
+
+[[dictionary]]
+name = "gold"
+tags = ["material", "metal", "noble"]
+
+[[dictionary]]
+name = "oak"
+tags = ["material", "wood"]
+
+[[dictionary]]
+name = "obsidian"
+tags = ["material", "stone", "battle"]
+
+[[dictionary]]
+name = "granite"
+tags = ["material", "stone"]
+        
+[[dictionary]]
+name = "bone"
+tags = ["material", "animal product"]
+[[dictionary]]
+name = "horn"
+tags = ["material", "animal product"]
+        
+[[dictionary]]
+name = "horse"
+tags = ["animal", "noble"]
+
+[[dictionary]]
+name = "dog"
+tags = ["animal"]        
+
+[[dictionary]]
+name = "castle"
+tags = ["building"]
+
+[[dictionary]]
+name = "temple"
+tags = ["building"]
+
+[[items]]
+name = "spoon"
+    # Always made of a material
+    [[items.modifiers]]
+    prepend = "@"
+    tags = ["material"]
+    chance = 1.0
+    # 20% to be shaped like a building
+    [[items.modifiers]]
+    append = "shaped like a @"
+    tags = ["building"]
+    chance = 0.2
+
+[[items]]
+name = "sword"
+    # Always made of a battle material
+    [[items.modifiers]]
+    prepend = "@"
+    tags = ["material&battle|material&noble"]
+    chance = 1.0
+    # 25% for special pommel
+    [[items.modifiers]]
+    append = "with a @ shaped pommel made of @"
+    tags = ["animal", "material"]
+    chance = 0.2
