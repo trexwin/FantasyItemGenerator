@@ -8,6 +8,6 @@ namespace SimpleFileReader.Console.Data
 {
     public class TestSubObject
     {
-        public string subtext { get; set; }
+        public TestSubSubObject subsub { get; set; }
     }
 }

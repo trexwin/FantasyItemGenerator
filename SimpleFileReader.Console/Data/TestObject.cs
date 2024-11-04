@@ -6,6 +6,6 @@
         public int number { get; set; }
         public double decimalnumber { get; set; }
 
-        public TestSubObject subobject { get; set; } = new TestSubObject();
+        public TestSubObject subobject { get; set; }
     }
 }

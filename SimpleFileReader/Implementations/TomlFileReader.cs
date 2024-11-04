@@ -15,11 +15,6 @@ namespace SimpleFileReader.Implementations
         // Simple naive implementation
         // Assumes all 'objects' are annotated with [], rather than having inline x.y keys
         // Only support inline string arrays with the ["x", "y", "z"] notation
-
-
-        private bool _currentIsList = false;
-        private string[] _currentSelector = [];
-
         public T ReadFile(string path)
         {
             // Retrieve all non-empty lines, remove comments
@@ -29,112 +24,133 @@ namespace SimpleFileReader.Implementations
                                 .Select(s => s.Trim())
                                 .Where(s => s.Length > 0);
 
-            // Create base object
-            T result = CreateInstance();
-
-            // Go line by line
-            foreach (string line in inputArr)
-            {
-                ReadLine(line, ref result);
-            }
+            T result = ParseInput(inputArr);
 
             return result;
+
         }
 
         private string RetrieveData(string path)
         {
-
             if (File.Exists(path))
             {
                 return File.ReadAllText(path);
-
             }
             throw new FileNotFoundException($"Could not retrieve file at {path}");
         }
 
-        private T CreateInstance()
+        private object CreateInstance(Type type)
         {
-            var constructors = typeof(T).GetConstructor([]);
+            var constructors = type.GetConstructor([]);
             if (constructors != null)
-                return (T)constructors.Invoke([]);
-            throw new Exception("No default constructor provided");
+                return constructors.Invoke([]);
+            throw new Exception($"No default constructor provided for {type.FullName}");
         }
 
-        private void ReadLine(string line, ref T result)
+        private T ParseInput(IEnumerable<string> input)
         {
+            T result = (T)CreateInstance(typeof(T));
+            object currentObject = result;
 
-            if (line[0] == '[')
+            foreach (string line in input)
             {
-                int index = line.IndexOf(']');
-                _currentIsList = line[1] == '[';
-                _currentSelector = line.Substring(_currentIsList ? 2 : 1, index - 1).Split('.');
-            } 
-            else
-            {
-                int index = line.IndexOf('=');
-                var key = line.Substring(0, index).Trim();
-                var val = line.Substring(index + 1).Trim();
+                if (line[0] == '[')
+                {
+                    int index = line.IndexOf(']');
+                    if (line[1] == '[')
+                    {
+                        // Create array
+                        throw new NotImplementedException();
+                    }
+                    else
+                    {
+                        // Create object of requested type
+                        string key = line.Substring(1, index - 1);
+                        currentObject = CreateNestedObject(result, key);
+                    }
+                }
+                else
+                {
+                    // Field value
+                    int index = line.IndexOf('=');
+                    var key = line.Substring(0, index).Trim();
+                    var val = line.Substring(index + 1).Trim();
 
-                object curObject = GetCurrentObject(result);
+                    if (key == "" || val == "")
+                        throw new Exception($"Data malformatted, must have a key and a value in \"{key} = {val}\"");
 
-                var property = curObject.GetType().GetProperty(key);
-                if (property == null)
-                    throw new KeyNotFoundException($"Data malformatted, could not find property {key}");
-                // Cast val to proper type, for now only strings
-                object valRes = ReadVal(key, val);
-                property.SetValue(curObject, valRes);
+                    currentObject = SetFieldValue(currentObject, key, val);
+                }
             }
+            return result;
         }
-        private object GetCurrentObject(in T start)
+
+        private object CreateNestedObject(object topObject, string key)
         {
-            object result = start;
-            foreach(string s in _currentSelector)
+            object result = topObject;
+            var nesting = key.Split('.');
+            foreach (string s in nesting)
             {
-                var property= result.GetType().GetProperty(s);
+                var property = result.GetType().GetProperty(s);
                 if (property == null)
                     throw new KeyNotFoundException($"Data malformatted, could not find property {s}");
                 var value = property.GetValue(result);
                 if (value == null)
-                    throw new NullReferenceException("Default constructor does not initialise all objects");
+                {
+                    value = CreateInstance(property.PropertyType);
+                    property.SetValue(result, value);
+                }
                 result = value;
             }
             return result;
         }
 
-        private object ReadVal(string key, string val)
+        private object SetFieldValue(object currentObject, string key, string value)
         {
-            if (val == "")
-                throw new Exception($"Data malformatted, {key} does not have a value");
+            var objectType = currentObject.GetType();
+            var property = objectType.GetProperty(key);
+            if (property == null)
+                throw new KeyNotFoundException($"Data malformatted, could not find property {key} for {objectType.FullName}");
 
-            object result;
-            switch (val[0])
+            if (property.PropertyType == typeof(string))
             {
-                case '"':
-                    result = val.Substring(1, val.Length - 2);
-                    break;
-                case '[':
-                    // Only handle inline string arrays
-                    var arr = val.Substring(1, val.Length - 2)
-                                 .Split(',')
-                                 .Select(s => s.Trim())
-                                 .Select(s => s.Substring(1, s.Length - 2))
-                                 .ToArray();
-                    result = arr ?? [];
-                    break;
-                default:
-                    // Number
-                    if(val.Contains('.'))
-                    {
-                        result = double.Parse(val);
+                if (value.First () == '"' && value.Last() == '"')
+                { property.SetValue(currentObject, value.Substring(1, value.Length - 2)); }
+                else
+                { throw new Exception($"Data malformatted, {key} requires a string"); }
+            }
+            else if (property.PropertyType == typeof(int))
+            {
+                try { property.SetValue(currentObject, int.Parse(value)); }
+                catch { throw new Exception($"Data malformatted, {key} requires an int"); }
+
+            }
+            else if (property.PropertyType == typeof(double))
+            {
+                try { property.SetValue(currentObject, double.Parse(value)); }
+                catch { throw new Exception($"Data malformatted, {key} requires a double"); }
+            }
+            else if (property.PropertyType == typeof(string[]))
+            {
+                if (value.First() == '[' && value.Last() == ']')
+                {
+                    var values = value.Substring(1, value.Length - 2)
+                                      .Split(',')
+                                      .Select(s => s.Trim());
+
+                    if (values.All(s => s.First() == '"' && s.Last() == '"'))
+                    { 
+                        property.SetValue(currentObject, 
+                                          values.Select(s => s.Substring(1, s.Length - 2)).ToArray()); 
                     }
                     else
-                    {
-                        result = int.Parse(val);
-                    }
-                    break;
+                    { throw new Exception($"Data malformatted, {key} requires a string[]"); }
+                }
+                else
+                { throw new Exception($"Data malformatted, {key} requires a string[]"); }
             }
 
-            return result;
+            return currentObject;
         }
     }
 

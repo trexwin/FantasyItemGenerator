@@ -2,5 +2,6 @@ text = "this is a test file"
 number = 42
 decimalnumber = 3.14
 
-[subobject]
-subtext =   "extra text"
+[subobject.subsub]
+name =   "john"
+tags = ["Test1", "Test2", "Test3"]
