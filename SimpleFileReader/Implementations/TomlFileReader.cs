@@ -44,7 +44,7 @@ namespace SimpleFileReader.Implementations
         private string RetrieveData(string path)
         {
 
-            if (!File.Exists(path))
+            if (File.Exists(path))
             {
                 return File.ReadAllText(path);
 
