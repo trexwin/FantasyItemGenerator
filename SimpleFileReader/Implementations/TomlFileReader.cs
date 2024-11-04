@@ -67,7 +67,7 @@ namespace SimpleFileReader.Implementations
             {
                 int index = line.IndexOf(']');
                 _currentIsList = line[1] == '[';
-                _currentSelector = line.Substring(_currentIsList ? 2 : 1, index).Split('.');
+                _currentSelector = line.Substring(_currentIsList ? 2 : 1, index - 1).Split('.');
             } 
             else
             {
@@ -81,7 +81,8 @@ namespace SimpleFileReader.Implementations
                 if (property == null)
                     throw new KeyNotFoundException($"Data malformatted, could not find property {key}");
                 // Cast val to proper type, for now only strings
-                property.SetValue(result, ReadVal(key, val));
+                object valRes = ReadVal(key, val);
+                property.SetValue(curObject, valRes);
             }
         }
         private object GetCurrentObject(in T start)
