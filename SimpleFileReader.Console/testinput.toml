@@ -1,19 +1,56 @@
-text = "this is a test file"
+[basic]
+text = "test text"
 number = 42
-decimalnumber = 3.14
+decnumber = 3.14
 
-[subobject.subsub]
-name =   "John"
-tags = ["Test1", "Test2", "Test3"]
+[basiclist]
+name = "basic"
+[[basiclist.list]]
+text = "1"
+number = 1
+decnumber = 1.1
+[[basiclist.list]]
+text = "2"
+number = 2
+decnumber = 2.2
+[[basiclist.list]]
+text = "3"
+number = 3
+decnumber = 3.3
 
-[[subsubobjects]]
-name = "Hank"
-tags = ["Test1"]
+[nestedlist]
+name = "nested"
+[[nestedlist.list]]
+name = "nested1"
+[[nestedlist.list.list]]
+text = "4"
 
-[[subsubobjects]]
-name = "John jr"
-tags = ["Test2"]
 
-[[subsubobjects]]
-name = "Anna"
-tags = ["Test4"]
+[[nestedlist.list]]
+name = "nested2"
+
+
+
+# [[nestedlist.list]]
+# name = "nested1"
+# [[nestedlist.list.list]]
+# text = "4"
+# number = 4
+# decnumber = 4.4
+# [[nestedlist.list.list]]
+# text = "5"
+# number = 5
+# decnumber = 5.5
+
+
+# [[nestedlist.list]]
+# name = "nested2"
+# [[nestedlist.list.list]]
+# text = "6"
+# number = 6
+# decnumber = 6.6
+# [[nestedlist.list.list]]
+# text = "7"
+# number = 7
+# decnumber = 7.7
+

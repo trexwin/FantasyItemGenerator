@@ -47,7 +47,7 @@ namespace SimpleFileReader.Implementations
                         currentObject = CreateNestedObject(result, key);
 
                         // Current object is a list, create new index
-                        currentObject = CreateListObject(currentObject, key);
+                        currentObject = CreateListItem(currentObject, key);
                     }
                     else
                     {
@@ -78,6 +78,18 @@ namespace SimpleFileReader.Implementations
             var nesting = key.Split('.');
             foreach (string s in nesting)
             {
+                // If a list, first get an item from it
+                if(IsSubclassOfGeneric(result.GetType(), typeof(ICollection<>)))
+                {
+                    var method = result.GetType().GetMethod("LastOrDefault");
+                    if (method == null)
+                        throw new KeyNotFoundException($"Data malformatted, {key} does not have an Last function");
+
+                    // Assume default is null for now
+                    result = method.Invoke(result, []) ?? CreateListItem(result, s);
+                }
+
+                // Retrieve property with name s or create it if needed
                 var property = result.GetType().GetProperty(s);
                 if (property == null)
                     throw new KeyNotFoundException($"Data malformatted, could not find property {s} of {key}");
@@ -92,7 +104,7 @@ namespace SimpleFileReader.Implementations
             return result;
         }
 
-        public object CreateListObject(object listObject, string key)
+        public object CreateListItem(object listObject, string key)
         {
             var typeArgs = listObject.GetType().GetGenericArguments();
             if (typeArgs.Length == 0)
@@ -103,7 +115,7 @@ namespace SimpleFileReader.Implementations
             // For now assume it has an add function
             var method = listObject.GetType().GetMethod("Add");
             if (method == null)
-                throw new KeyNotFoundException($"Data malformatted, {key} does not have an add function");
+                throw new KeyNotFoundException($"Data malformatted, {key} does not have an Add function");
 
             method.Invoke(listObject, [result]);
 
@@ -156,6 +168,17 @@ namespace SimpleFileReader.Implementations
             }
 
             return currentObject;
+        }
+
+        bool IsSubclassOfGeneric(Type? current, Type genericBase)
+        {
+            while (current != null)
+            {
+                if (current.IsGenericType && current.GetGenericTypeDefinition() == genericBase.GetGenericTypeDefinition())
+                    return true;
+                current = current.BaseType;
+            }
+            return false;
         }
     }
 

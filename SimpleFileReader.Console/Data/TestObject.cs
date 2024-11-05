@@ -1,28 +1,24 @@
-﻿namespace SimpleFileReader.Console.Data
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace SimpleFileReader.Console.Data
 {
-    public class TestObject
+    internal class TestObject : IPrintable
     {
-        public string text { get; set; }
-        public int number { get; set; }
-        public double decimalnumber { get; set; }
-
-        public TestSubObject subobject { get; set; }
-
-        public List<TestSubSubObject> subsubobjects { get; set; }
+        public BasicObject basic { get; set; }
+        public ListObject<BasicObject> basiclist { get; set; }
+        public ListObject<ListObject<BasicObject>> nestedlist { get; set; }
 
         public string Print()
         {
-            string result = $"My text is \"{text}\".\n";
-            result += $"My number is {number}.\n";
-            result += $"My decimal is {decimalnumber}.\n";
-            result += $"I have a SubObject.\n" + subobject.Print();
-            result += $"I have alist of subsubobjects.\n";
-            foreach (var s in subsubobjects)
-            {
-                result += s.Print();
-            }
-
-            return result;
+            var res = "Test object:\n";
+            res += basic.Print();
+            res += basiclist.Print();
+            res += nestedlist.Print();
+            return res;
         }
     }
 }
