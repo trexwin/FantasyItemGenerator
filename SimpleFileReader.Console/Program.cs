@@ -1,7 +1,4 @@
-﻿
-
-
-using SimpleFileReader;
+﻿using SimpleFileReader;
 using SimpleFileReader.Console.Data;
 using SimpleFileReader.Implementations;
 

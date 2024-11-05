@@ -10,13 +10,13 @@ using System.Threading.Tasks;
 
 namespace SimpleFileReader.Implementations
 {
-    public class TomlFileReader<T> : IFileReader<T> where T : class, new()
+    public class TomlFileReader<T> : BaseFileReader<T> where T : class, new()
     {
         // Simple limited toml reader implementation
         // Assumes all 'objects' are annotated with [], rather than having inline x.y keys
         // Limited support for data types, see SetFieldValue
 
-        public T ReadFile(string path)
+        public override T ReadFile(string path)
         {
             // Retrieve all non-empty lines, remove comments
             string input = RetrieveData(path);
@@ -31,24 +31,7 @@ namespace SimpleFileReader.Implementations
 
         }
 
-        private string RetrieveData(string path)
-        {
-            if (File.Exists(path))
-            {
-                return File.ReadAllText(path);
-            }
-            throw new FileNotFoundException($"Could not retrieve file at {path}");
-        }
-
-        private object CreateInstance(Type type)
-        {
-            var constructors = type.GetConstructor([]);
-            if (constructors != null)
-                return constructors.Invoke([]);
-            throw new Exception($"No default constructor provided for {type.FullName}");
-        }
-
-        private T ParseInput(IEnumerable<string> input)
+        public T ParseInput(IEnumerable<string> input)
         {
             T result = (T)CreateInstance(typeof(T));
             object currentObject = result;
@@ -89,7 +72,7 @@ namespace SimpleFileReader.Implementations
             return result;
         }
 
-        private object CreateNestedObject(object topObject, string key)
+        public object CreateNestedObject(object topObject, string key)
         {
             object result = topObject;
             var nesting = key.Split('.');
@@ -109,8 +92,7 @@ namespace SimpleFileReader.Implementations
             return result;
         }
 
-
-        private object CreateListObject(object listObject, string key)
+        public object CreateListObject(object listObject, string key)
         {
             var typeArgs = listObject.GetType().GetGenericArguments();
             if (typeArgs.Length == 0)
@@ -128,7 +110,7 @@ namespace SimpleFileReader.Implementations
             return result;
         }
 
-        private object SetFieldValue(object currentObject, string key, string value)
+        public object SetFieldValue(object currentObject, string key, string value)
         {
             var objectType = currentObject.GetType();
             var property = objectType.GetProperty(key);
