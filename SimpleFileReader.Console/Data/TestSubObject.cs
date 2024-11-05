@@ -9,5 +9,10 @@ namespace SimpleFileReader.Console.Data
     public class TestSubObject
     {
         public TestSubSubObject subsub { get; set; }
+
+        public string Print()
+        {
+            return $"I'm a Subobject.\n" + subsub.Print();
+        }
     }
 }

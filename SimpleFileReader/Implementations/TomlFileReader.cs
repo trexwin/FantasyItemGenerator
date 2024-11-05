@@ -12,9 +12,10 @@ namespace SimpleFileReader.Implementations
 {
     public class TomlFileReader<T> : IFileReader<T> where T : class, new()
     {
-        // Simple naive implementation
+        // Simple limited toml reader implementation
         // Assumes all 'objects' are annotated with [], rather than having inline x.y keys
-        // Only support inline string arrays with the ["x", "y", "z"] notation
+        // Limited support for data types, see SetFieldValue
+
         public T ReadFile(string path)
         {
             // Retrieve all non-empty lines, remove comments
@@ -56,16 +57,19 @@ namespace SimpleFileReader.Implementations
             {
                 if (line[0] == '[')
                 {
-                    int index = line.IndexOf(']');
                     if (line[1] == '[')
                     {
-                        // Create array
-                        throw new NotImplementedException();
+                        // Create list and object of requested type
+                        string key = line.Substring(2, line.Length - 4);
+                        currentObject = CreateNestedObject(result, key);
+
+                        // Current object is a list, create new index
+                        currentObject = CreateListObject(currentObject, key);
                     }
                     else
                     {
                         // Create object of requested type
-                        string key = line.Substring(1, index - 1);
+                        string key = line.Substring(1, line.Length - 2);
                         currentObject = CreateNestedObject(result, key);
                     }
                 }
@@ -93,7 +97,7 @@ namespace SimpleFileReader.Implementations
             {
                 var property = result.GetType().GetProperty(s);
                 if (property == null)
-                    throw new KeyNotFoundException($"Data malformatted, could not find property {s}");
+                    throw new KeyNotFoundException($"Data malformatted, could not find property {s} of {key}");
                 var value = property.GetValue(result);
                 if (value == null)
                 {
@@ -102,6 +106,25 @@ namespace SimpleFileReader.Implementations
                 }
                 result = value;
             }
+            return result;
+        }
+
+
+        private object CreateListObject(object listObject, string key)
+        {
+            var typeArgs = listObject.GetType().GetGenericArguments();
+            if (typeArgs.Length == 0)
+                throw new KeyNotFoundException($"Data malformatted, {key} is not a generic");
+
+            object result = CreateInstance(typeArgs[0]);
+
+            // For now assume it has an add function
+            var method = listObject.GetType().GetMethod("Add");
+            if (method == null)
+                throw new KeyNotFoundException($"Data malformatted, {key} does not have an add function");
+
+            method.Invoke(listObject, [result]);
+
             return result;
         }
 

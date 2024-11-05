@@ -3,5 +3,17 @@ number = 42
 decimalnumber = 3.14
 
 [subobject.subsub]
-name =   "john"
+name =   "John"
 tags = ["Test1", "Test2", "Test3"]
+
+[[subsubobjects]]
+name = "Hank"
+tags = ["Test1"]
+
+[[subsubobjects]]
+name = "John jr"
+tags = ["Test2"]
+
+[[subsubobjects]]
+name = "Anna"
+tags = ["Test4"]
