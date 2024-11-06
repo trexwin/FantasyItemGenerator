@@ -13,9 +13,7 @@ namespace SimpleFileReader.Implementations
         public string RetrieveData(string path)
         {
             if (File.Exists(path))
-            {
                 return File.ReadAllText(path);
-            }
             throw new FileNotFoundException($"Could not retrieve file at {path}");
         }
 

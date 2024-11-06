@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SimpleFileReader.Implementations;
+﻿using SimpleFileReader.Implementations;
 
-namespace SimpleFileReader.Test.Data
+namespace SimpleFileReader.Test.Mocks
 {
     internal class TestFileReader<T> : BaseFileReader<T> where T : class, new()
     {

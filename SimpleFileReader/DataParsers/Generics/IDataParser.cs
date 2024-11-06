@@ -4,9 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SimpleFileReader.Test.Data
+namespace SimpleFileReader.DataParsers.Generics
 {
-    internal class PropertyData
+    public interface IDataParser<T> : IDataParser
     {
+        public new T Parse(string data);
     }
 }

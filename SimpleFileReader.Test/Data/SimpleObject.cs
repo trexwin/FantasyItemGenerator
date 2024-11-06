@@ -1,6 +1,7 @@
 ﻿namespace SimpleFileReader.Test.Data
 {
-    internal class SimpleObject
+    public class SimpleObject<T>
     {
+        public T Value { get; set; }
     }
 }

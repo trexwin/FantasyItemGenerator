@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.VisualBasic;
+using SimpleFileReader.DataParsers.Implementations;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Dynamic;
@@ -10,17 +12,24 @@ using System.Threading.Tasks;
 
 namespace SimpleFileReader.Implementations
 {
+    // Simple limited toml reader implementation
+    // Assumes all 'objects' are annotated with [], rather than having inline x.y keys
+    // Assumes that any # starts a comment, even within a string
+    // Limited support for data types, see the DataParsers
+
     public class TomlFileReader<T> : BaseFileReader<T> where T : class, new()
     {
-        // Simple limited toml reader implementation
-        // Assumes all 'objects' are annotated with [], rather than having inline x.y keys
-        // Limited support for data types, see SetFieldValue
+
+        private ObjectDataParser _parser;
+
+        public TomlFileReader()
+            => _parser = new ObjectDataParser();
 
         public override T ReadFile(string path)
         {
             // Retrieve all non-empty lines, remove comments
             string input = RetrieveData(path);
-            var inputArr = input.Split(Environment.NewLine, StringSplitOptions.None)
+            var inputArr = input.Split(Environment.NewLine)
                                 .Select(s => { var i = s.IndexOf('#'); return i < 0 ? s : s.Substring(0, i); })
                                 .Select(s => s.Trim())
                                 .Where(s => s.Length > 0);
@@ -60,11 +69,14 @@ namespace SimpleFileReader.Implementations
                 {
                     // Field value
                     int index = line.IndexOf('=');
+                    if (index < 0)
+                        throw new FormatException($"Data malformatted, could not find =");
+
                     var key = line.Substring(0, index).Trim();
                     var val = line.Substring(index + 1).Trim();
 
                     if (key == "" || val == "")
-                        throw new Exception($"Data malformatted, must have a key and a value in \"{key} = {val}\"");
+                        throw new FormatException($"Data malformatted, must have a key and a value in \"{key} = {val}\"");
 
                     currentObject = SetFieldValue(currentObject, key, val);
                 }
@@ -78,21 +90,14 @@ namespace SimpleFileReader.Implementations
             var nesting = key.Split('.');
             foreach (string s in nesting)
             {
-                // If a list, first get an item from it
-                if(IsSubclassOfGeneric(result.GetType(), typeof(ICollection<>)))
-                {
-                    var method = result.GetType().GetMethod("LastOrDefault");
-                    if (method == null)
-                        throw new KeyNotFoundException($"Data malformatted, {key} does not have an Last function");
-
-                    // Assume default is null for now
-                    result = method.Invoke(result, []) ?? CreateListItem(result, s);
-                }
+                // If a list, first get last or new item from it
+                if (result is IEnumerable<object>) // Works because of Covariance
+                    result = Enumerable.LastOrDefault((IEnumerable<object>)result) ?? CreateListItem(result, s);
 
                 // Retrieve property with name s or create it if needed
                 var property = result.GetType().GetProperty(s);
                 if (property == null)
-                    throw new KeyNotFoundException($"Data malformatted, could not find property {s} of {key}");
+                    throw new FormatException($"Data malformatted, could not find property {s} of {key}");
                 var value = property.GetValue(result);
                 if (value == null)
                 {
@@ -108,14 +113,14 @@ namespace SimpleFileReader.Implementations
         {
             var typeArgs = listObject.GetType().GetGenericArguments();
             if (typeArgs.Length == 0)
-                throw new KeyNotFoundException($"Data malformatted, {key} is not a generic");
+                throw new FormatException($"Data malformatted, {key} is not a generic");
 
             object result = CreateInstance(typeArgs[0]);
 
             // For now assume it has an add function
             var method = listObject.GetType().GetMethod("Add");
             if (method == null)
-                throw new KeyNotFoundException($"Data malformatted, {key} does not have an Add function");
+                throw new FormatException($"Data malformatted, {key} does not have an Add function");
 
             method.Invoke(listObject, [result]);
 
@@ -127,58 +132,11 @@ namespace SimpleFileReader.Implementations
             var objectType = currentObject.GetType();
             var property = objectType.GetProperty(key);
             if (property == null)
-                throw new KeyNotFoundException($"Data malformatted, could not find property {key} for {objectType.FullName}");
+                throw new FormatException($"Data malformatted, could not find property {key} for {objectType.FullName}");
 
-            if (property.PropertyType == typeof(string))
-            {
-                if (value.First () == '"' && value.Last() == '"')
-                { property.SetValue(currentObject, value.Substring(1, value.Length - 2)); }
-                else
-                { throw new Exception($"Data malformatted, {key} requires a string"); }
-            }
-            else if (property.PropertyType == typeof(int))
-            {
-                try { property.SetValue(currentObject, int.Parse(value)); }
-                catch { throw new Exception($"Data malformatted, {key} requires an int"); }
-
-            }
-            else if (property.PropertyType == typeof(double))
-            {
-                try { property.SetValue(currentObject, double.Parse(value)); }
-                catch { throw new Exception($"Data malformatted, {key} requires a double"); }
-            }
-            else if (property.PropertyType == typeof(string[]))
-            {
-                if (value.First() == '[' && value.Last() == ']')
-                {
-                    var values = value.Substring(1, value.Length - 2)
-                                      .Split(',')
-                                      .Select(s => s.Trim());
-
-                    if (values.All(s => s.First() == '"' && s.Last() == '"'))
-                    { 
-                        property.SetValue(currentObject, 
-                                          values.Select(s => s.Substring(1, s.Length - 2)).ToArray()); 
-                    }
-                    else
-                    { throw new Exception($"Data malformatted, {key} requires a string[]"); }
-                }
-                else
-                { throw new Exception($"Data malformatted, {key} requires a string[]"); }
-            }
+            _parser.ParseAndUpdate(currentObject, property, value);
 
             return currentObject;
-        }
-
-        bool IsSubclassOfGeneric(Type? current, Type genericBase)
-        {
-            while (current != null)
-            {
-                if (current.IsGenericType && current.GetGenericTypeDefinition() == genericBase.GetGenericTypeDefinition())
-                    return true;
-                current = current.BaseType;
-            }
-            return false;
         }
     }
 

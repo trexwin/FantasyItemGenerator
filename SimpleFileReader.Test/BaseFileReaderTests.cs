@@ -1,20 +1,20 @@
 using SimpleFileReader.Implementations;
 using SimpleFileReader.Test.Data;
+using SimpleFileReader.Test.Mocks;
 
 namespace SimpleFileReader.Test
 {
     public class BaseFileReaderTests
     {
-        private BaseFileReader<SimpleObject> _reader;
+        private BaseFileReader<SimpleObject<object>> _reader;
         
         [SetUp]
         public void Setup()
         {
             // Arrange
-            _reader = new TestFileReader<SimpleObject>();
+            _reader = new TestFileReader<SimpleObject<object>>();
         }
         
-
         [Test]
         public void CreateInstanceNoConstructorDoesNotThrow()
         {
