@@ -10,14 +10,14 @@ namespace SimpleFileReader.Implementations
     {
         public abstract T ReadFile(string path);
 
-        public string RetrieveData(string path)
+        protected string RetrieveData(string path)
         {
             if (File.Exists(path))
                 return File.ReadAllText(path);
             throw new FileNotFoundException($"Could not retrieve file at {path}");
         }
 
-        public object CreateInstance(Type type)
+        protected object CreateInstance(Type type)
         {
             var constructors = type.GetConstructor([]);
             if (constructors != null)

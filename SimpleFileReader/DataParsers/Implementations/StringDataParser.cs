@@ -6,7 +6,7 @@ namespace SimpleFileReader.DataParsers.Implementations
     {
         public override string Parse(string data)
         {
-            if (data.First() == '"' && data.Last() == '"')
+            if (data.Length >= 2 && data.First() == '"' && data.Last() == '"')
                 return data.Substring(1, data.Length - 2);
             throw new FormatException($"{data} is not a correctly formatted string");
         }

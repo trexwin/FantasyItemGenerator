@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\FantasyItemGenerator\FantasyItemGenerator.csproj" />
     <ProjectReference Include="..\SimpleFileReader\SimpleFileReader.csproj" />
   </ItemGroup>
 

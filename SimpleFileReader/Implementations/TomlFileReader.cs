@@ -14,8 +14,10 @@ namespace SimpleFileReader.Implementations
 {
     // Simple limited toml reader implementation
     // Assumes all 'objects' are annotated with [], rather than having inline x.y keys
-    // Assumes that any # starts a comment, even within a string
+    // Only allow comments on separate lines
     // Limited support for data types, see the DataParsers
+
+    // Probably need to switch to a more functional approach if proper parser
 
     public class TomlFileReader<T> : BaseFileReader<T> where T : class, new()
     {
@@ -30,9 +32,8 @@ namespace SimpleFileReader.Implementations
             // Retrieve all non-empty lines, remove comments
             string input = RetrieveData(path);
             var inputArr = input.Split(Environment.NewLine)
-                                .Select(s => { var i = s.IndexOf('#'); return i < 0 ? s : s.Substring(0, i); })
                                 .Select(s => s.Trim())
-                                .Where(s => s.Length > 0);
+                                .Where(s => s.Length > 0 && s.First() != '#');
 
             T result = ParseInput(inputArr);
 
@@ -75,7 +76,7 @@ namespace SimpleFileReader.Implementations
                     var key = line.Substring(0, index).Trim();
                     var val = line.Substring(index + 1).Trim();
 
-                    if (key == "" || val == "")
+                    if (key == string.Empty || val == string.Empty)
                         throw new FormatException($"Data malformatted, must have a key and a value in \"{key} = {val}\"");
 
                     currentObject = SetFieldValue(currentObject, key, val);
@@ -84,7 +85,7 @@ namespace SimpleFileReader.Implementations
             return result;
         }
 
-        public object CreateNestedObject(object topObject, string key)
+        protected object CreateNestedObject(object topObject, string key)
         {
             object result = topObject;
             var nesting = key.Split('.');
@@ -109,7 +110,7 @@ namespace SimpleFileReader.Implementations
             return result;
         }
 
-        public object CreateListItem(object listObject, string key)
+        protected object CreateListItem(object listObject, string key)
         {
             var typeArgs = listObject.GetType().GetGenericArguments();
             if (typeArgs.Length == 0)
@@ -127,7 +128,7 @@ namespace SimpleFileReader.Implementations
             return result;
         }
 
-        public object SetFieldValue(object currentObject, string key, string value)
+        protected object SetFieldValue(object currentObject, string key, string value)
         {
             var objectType = currentObject.GetType();
             var property = objectType.GetProperty(key);

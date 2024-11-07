@@ -6,7 +6,7 @@ namespace SimpleFileReader.Test
 {
     public class BaseFileReaderTests
     {
-        private BaseFileReader<SimpleObject<object>> _reader;
+        private TestFileReader<SimpleObject<object>> _reader;
         
         [SetUp]
         public void Setup()
