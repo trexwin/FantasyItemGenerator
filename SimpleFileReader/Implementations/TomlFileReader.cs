@@ -1,14 +1,4 @@
-﻿using Microsoft.VisualBasic;
-using SimpleFileReader.DataParsers.Implementations;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Dynamic;
-using System.Linq;
-using System.Numerics;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
+﻿using SimpleFileReader.DataParsers.Implementations;
 
 namespace SimpleFileReader.Implementations
 {
