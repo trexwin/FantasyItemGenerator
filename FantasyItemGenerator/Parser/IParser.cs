@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FantasyItemGenerator.Data
+namespace FantasyItemGenerator.Parser
 {
-    internal interface IInitialsedCheck
+    internal interface IParser<T, U>
     {
-        public bool IsInitialised();
+        public U Parse(T input);
     }
 }

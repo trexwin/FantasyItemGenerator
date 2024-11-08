@@ -7,17 +7,21 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="InputFiles\FantasyInput.toml" />
+    <None Remove="Examples\FantasyInput.toml" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="InputFiles\FantasyInput.toml">
+    <Content Include="Examples\FantasyInput.toml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\SimpleFileReader\SimpleFileReader.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="ParsedData\" />
   </ItemGroup>
 
 </Project>
