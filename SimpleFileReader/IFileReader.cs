@@ -4,9 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FantasyItemGenerator
+namespace SimpleFileReader
 {
-    public class Class1
+    public interface IFileReader<T> where T : class, new()
     {
+        public T ReadFile(string path);
+
     }
 }
