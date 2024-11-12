@@ -1,4 +1,4 @@
-﻿namespace FantasyItemGenerator.Data.Unparsed
+﻿namespace FantasyItemGenerator.Model.Input
 {
     internal class Modifier
     {

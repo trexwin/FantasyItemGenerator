@@ -1,20 +1,23 @@
-﻿using FantasyItemGenerator.Data.Parsed;
-using FantasyItemGenerator.Data.Unparsed;
-using FantasyItemGenerator.Parser;
+﻿using FantasyItemGenerator.Model;
+using FantasyItemGenerator.Model.Input;
+using FantasyItemGenerator.Transform;
 using SimpleFileReader;
+using System;
 
 namespace FantasyItemGenerator
 {
     public class ItemGenerator
     {
-        private List<ParsedItem>? _items;
+        private Random _random;
+        private List<SimpleItem>? _items;
         private FileReaderFactory _readerFactory;
-        private SettingsParser _settingsParser;
+        private SettingsTransformer _settingsTransformer;
 
         public ItemGenerator()
         {
+            _random = new Random();
             _readerFactory = new FileReaderFactory();
-            _settingsParser = new SettingsParser();
+            _settingsTransformer = new SettingsTransformer();
         }
 
         public string[] GenerateItem(int amount)
@@ -25,12 +28,18 @@ namespace FantasyItemGenerator
             var result = new string[amount];
             for (int i = 0; i < amount; i++)
             {
-                // Select a random item
-                // Iterate through modifiers
-                // Store final result
-                result[i] = String.Empty;
+                var item = _items[_random.Next(_items.Count)];
+                var res = item.Name;
+                foreach (var modifier in item.Modifiers)
+                {
+                    var val = _random.NextDouble();
+                    if (val < modifier.Chance)
+                    {
+                        // Append and prepend with random relevant words
+                    }
+                }
+                result[i] = res;
             }
-
             return result;
         }
 
@@ -45,7 +54,7 @@ namespace FantasyItemGenerator
             var settings = reader.ReadFile(path);
 
             // Parse new settings
-            _items = _settingsParser.Parse(settings);
+            _items = _settingsTransformer.Transform(settings);
         }
 
     }

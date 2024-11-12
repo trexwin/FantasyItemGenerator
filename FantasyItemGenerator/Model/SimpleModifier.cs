@@ -1,13 +1,13 @@
-﻿namespace FantasyItemGenerator.Data.Parsed
+﻿namespace FantasyItemGenerator.Model
 {
-    internal class ParsedModifier
+    internal class SimpleModifier
     {
         public double Chance { get; set; }
-        public string[] Prepend {  get; set; }
+        public string[] Prepend { get; set; }
         public string[] Append { get; set; }
         public string[][] Words { get; set; }
 
-        public ParsedModifier(double chance,  string[] prepend, string[] append, string[][] words)
+        public SimpleModifier(double chance, string[] prepend, string[] append, string[][] words)
         {
             Chance = chance;
             Prepend = prepend;

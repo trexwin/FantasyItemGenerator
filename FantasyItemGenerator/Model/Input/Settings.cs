@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace FantasyItemGenerator.Data.Unparsed
+namespace FantasyItemGenerator.Model.Input
 {
     internal class Settings
     {
