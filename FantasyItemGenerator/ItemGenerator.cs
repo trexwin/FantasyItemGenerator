@@ -35,7 +35,29 @@ namespace FantasyItemGenerator
                     var val = _random.NextDouble();
                     if (val < modifier.Chance)
                     {
-                        // Append and prepend with random relevant words
+                        // Retrieve all words
+                        var words = modifier.Words.Select(w => w[_random.Next(w.Length)]).ToArray();
+
+                        // interweave lists and result
+                        int j = 0;
+                        if (modifier.Prepend.Any())
+                        {
+                            var prepend = modifier.Prepend[0];
+                            for(int k = 1; k < modifier.Prepend.Length; j++, k++)
+                            {
+                                prepend += words[j] + modifier.Prepend[k];
+                            }
+                            res = prepend + ' ' + res;
+                        }
+                        if (modifier.Append.Any())
+                        {
+                            var append = modifier.Append[0];
+                            for (int k = 1; k < modifier.Append.Length; j++, k++)
+                            {
+                                append += words[j] + modifier.Append[k];
+                            }
+                            res += ' ' + append;
+                        }
                     }
                 }
                 result[i] = res;

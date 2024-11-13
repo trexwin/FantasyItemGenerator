@@ -56,7 +56,7 @@ Name = "spoon"
     Chance = 1.0
     # 20% to be shaped like a building
     [[Items.Modifiers]]
-    Append = "shaped like a @"
+    Append = "with a handle shaped like a @"
     Tags = ["building"]
     Chance = 0.2
 
@@ -67,8 +67,8 @@ Name = "sword"
     Prepend = "@"
     Tags = ["material&battle|material&noble"]
     Chance = 1.0
-    # 25% for special pommel
+    # 20% for special pommel
     [[Items.Modifiers]]
-    Append = "with a @ shaped pommel made of @"
-    Tags = ["animal", "material"]
+    Append = "with a @ @-shaped pommel"
+    Tags = ["material", "animal"]
     Chance = 0.2

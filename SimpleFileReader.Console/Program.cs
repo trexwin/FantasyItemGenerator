@@ -2,9 +2,9 @@
 
 
 ItemGenerator generator = new ItemGenerator();
-generator.ReadSettings(Path.Combine(Environment.CurrentDirectory, @"FantasyInput.toml"));
-var items = generator.GenerateItem(3);
-Console.WriteLine(String.Join(", ", items));
+generator.ReadSettings(Path.Combine(Environment.CurrentDirectory, "FantasyInput.toml"));
+var items = generator.GenerateItem(10);
+Console.WriteLine(String.Join('\n', items));
 
 
 /*

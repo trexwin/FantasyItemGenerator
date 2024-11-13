@@ -29,18 +29,13 @@ namespace FantasyItemGenerator.Transform
                 var words = new string[numWords][];
                 if (input.Tags != null)
                 {
+                    var tagTransformer = new TagTransformer();
                     for (int i = 0; i < numWords; i++)
                     {
-                        var tagReqs = input.Tags[i].Split('|').Select(t => t.Split('&'));
-                        var matchedWords =
-                            _dictionary.Where(
-                                w => tagReqs.Any(
-                                    tags => !tags.Except(w.Tags ?? []).Any()
-                                )
-                            ).Select(w => w.Name ?? string.Empty).ToArray();
+                        var tagPred = tagTransformer.Transform(input.Tags[i]);
+                        var matchedWords = _dictionary.Where(tagPred.Invoke).Select(w => w.Name ?? string.Empty).ToArray();
                         words[i] = matchedWords;
                     }
-
                 }
                 return new SimpleModifier(input.Chance, prepend, append, words);
             }
