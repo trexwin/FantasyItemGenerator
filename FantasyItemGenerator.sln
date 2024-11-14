@@ -7,9 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleFileReader", "SimpleF
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FantasyItemGenerator", "FantasyItemGenerator\FantasyItemGenerator.csproj", "{BA2A6C2F-2E67-4D07-9961-4ACD841ADB6F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleFileReader.Console", "SimpleFileReader.Console\SimpleFileReader.Console.csproj", "{6F3EDB76-0DE2-454D-BEB5-D5D0CFB1349A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FantasyItemGenerator.Console", "SimpleFileReader.Console\FantasyItemGenerator.Console.csproj", "{6F3EDB76-0DE2-454D-BEB5-D5D0CFB1349A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleFileReader.Test", "SimpleFileReader.Test\SimpleFileReader.Test.csproj", "{DBA97630-CB06-4FBC-9732-FA5E51FABD62}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleFileReader.Test", "SimpleFileReader.Test\SimpleFileReader.Test.csproj", "{DBA97630-CB06-4FBC-9732-FA5E51FABD62}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

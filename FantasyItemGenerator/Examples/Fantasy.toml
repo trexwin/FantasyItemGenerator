@@ -1,4 +1,4 @@
-Tags = ["material", "metal", "battle", "noble", "wood", "stone", "animal product", "animal", "building"]
+Tags = ["material", "metal", "battle", "noble", "wood", "stone", "animal product", "animal", "building", "sword type"]
 
 [[Dictionary]]
 Name = "copper"
@@ -47,28 +47,49 @@ Tags = ["building"]
 Name = "temple"
 Tags = ["building"]
 
+[[Dictionary]]
+Name = "broad"
+Tags = ["sword type"]
+
+[[Dictionary]]
+Name = "curved"
+Tags = ["sword type"]
+
+[[Dictionary]]
+Name = "short"
+Tags = ["sword type"]
+
+[[Dictionary]]
+Name = "long"
+Tags = ["sword type"]
+
 [[Items]]
 Name = "spoon"
     # Always made of a material
     [[Items.Modifiers]]
-    Prepend = "@"
+    Prepend = "@ "
     Tags = ["material"]
     Chance = 1.0
     # 20% to be shaped like a building
     [[Items.Modifiers]]
-    Append = "with a handle shaped like a @"
+    Append = " with a handle shaped like a @"
     Tags = ["building"]
     Chance = 0.2
 
 [[Items]]
 Name = "sword"
-    # Always made of a battle material
+    # 50% to be a specific type of sword
     [[Items.Modifiers]]
     Prepend = "@"
+    Tags = ["sword type"]
+    Chance = 0.5
+    # Always made of a battle material
+    [[Items.Modifiers]]
+    Prepend = "@ "
     Tags = ["material&battle|material&noble"]
     Chance = 1.0
     # 20% for special pommel
     [[Items.Modifiers]]
-    Append = "with a @ @-shaped pommel"
+    Append = " with a @ @-shaped pommel"
     Tags = ["material", "animal"]
     Chance = 0.2

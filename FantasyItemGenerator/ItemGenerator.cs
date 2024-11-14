@@ -20,10 +20,13 @@ namespace FantasyItemGenerator
             _settingsTransformer = new SettingsTransformer();
         }
 
-        public string[] GenerateItem(int amount)
+        public string[] GetExampleFiles()
+            => Directory.GetFiles(Path.Combine(Environment.CurrentDirectory, @"Examples"), "*.*", SearchOption.TopDirectoryOnly);
+
+        public string[]? GenerateItem(int amount)
         {
             if (_items == null)
-                return [];
+                return null;
 
             var result = new string[amount];
             for (int i = 0; i < amount; i++)
@@ -36,27 +39,20 @@ namespace FantasyItemGenerator
                     if (val < modifier.Chance)
                     {
                         // Retrieve all words
-                        var words = modifier.Words.Select(w => w[_random.Next(w.Length)]).ToArray();
+                        var words = modifier.Words.Select(w => w[_random.Next(w.Length)]);
 
                         // interweave lists and result
-                        int j = 0;
                         if (modifier.Prepend.Any())
                         {
-                            var prepend = modifier.Prepend[0];
-                            for(int k = 1; k < modifier.Prepend.Length; j++, k++)
-                            {
-                                prepend += words[j] + modifier.Prepend[k];
-                            }
-                            res = prepend + ' ' + res;
+                            var preWords = words.Take(modifier.Prepend.Length);
+                            var pre = modifier.Prepend.Zip(preWords, (f, s) => f + s).Append(modifier.Prepend.Last());
+                            res = string.Join(null, pre) + res;
                         }
                         if (modifier.Append.Any())
                         {
-                            var append = modifier.Append[0];
-                            for (int k = 1; k < modifier.Append.Length; j++, k++)
-                            {
-                                append += words[j] + modifier.Append[k];
-                            }
-                            res += ' ' + append;
+                            var appWords = words.Take(modifier.Append.Length);
+                            var app = modifier.Append.Zip(appWords, (f, s) => f + s).Append(modifier.Append.Last());
+                            res += string.Join(null, app);
                         }
                     }
                 }
