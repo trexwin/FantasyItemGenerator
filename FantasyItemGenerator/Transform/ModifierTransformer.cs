@@ -35,6 +35,9 @@ namespace FantasyItemGenerator.Transform
                         var tagPred = tagTransformer.Transform(input.Tags[i]);
                         var matchedWords = _dictionary.Where(tagPred.Invoke).Select(w => w.Name ?? string.Empty).ToArray();
                         words[i] = matchedWords;
+
+                        if (!matchedWords.Any())
+                            throw new Exception($"Could not find a word that has the following tags \"{input.Tags[i]}\".");
                     }
                 }
                 return new SimpleModifier(input.Chance, prepend, append, words);
