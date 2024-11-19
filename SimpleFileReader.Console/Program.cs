@@ -1,5 +1,4 @@
 ﻿using FantasyItemGenerator;
-using System.Runtime.CompilerServices;
 
 Console.WriteLine(" = Welcome to FantasyItemGenerator = ");
 Console.WriteLine("Write \"Help\" to view all commands.");

@@ -205,11 +205,6 @@ Name = "fishing hook"
     Prepend = "@ "
     Tags = ["material&metal&solid"]
     Chance = 1.0
-    [[Items.Modifiers]]
-    Prepend = "@ "
-    Tags = ["material&metal&solid"]
-    Chance = 1.0
-
 
 
 # Weapons & armour (todo)
