@@ -1,4 +1,4 @@
-﻿using SimpleFileReader.DataParsers.Implementations;
+using SimpleFileReader.DataParsers.Implementations;
 
 namespace SimpleFileReader.Implementations
 {

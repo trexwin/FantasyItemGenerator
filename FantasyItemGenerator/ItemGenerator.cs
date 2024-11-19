@@ -1,4 +1,4 @@
-﻿using FantasyItemGenerator.Model;
+using FantasyItemGenerator.Model;
 using FantasyItemGenerator.Model.Input;
 using FantasyItemGenerator.Transform;
 using SimpleFileReader;
@@ -74,6 +74,5 @@ namespace FantasyItemGenerator
             // Parse new settings
             _items = _settingsTransformer.Transform(settings);
         }
-
     }
 }
