@@ -1,0 +1,232 @@
+Tags = ["material", "metal", "battle", "noble", "wood", "stone", "animal product", "animal", "object", "sword type", "large", "solid", "inscription"]
+
+[[Dictionary]]
+Name = "copper"
+Tags = ["material", "large", "solid", "metal", "battle"]
+[[Dictionary]]
+Name = "tin"
+Tags = ["material", "large", "solid", "metal"]
+[[Dictionary]]
+Name = "bronze"
+Tags = ["material", "large", "solid", "metal", "battle"]
+[[Dictionary]]
+Name = "lead"
+Tags = ["material", "large", "solid", "metal"]
+[[Dictionary]]
+Name = "iron"
+Tags = ["material", "large", "solid", "metal", "battle"]
+[[Dictionary]]
+Name = "steel"
+Tags = ["material", "large", "solid", "metal", "battle"]
+[[Dictionary]]
+Name = "silver"
+Tags = ["material", "large", "solid", "metal", "noble"]
+[[Dictionary]]
+Name = "gold"
+Tags = ["material", "large", "solid", "metal", "noble"]
+[[Dictionary]]
+Name = "mercury"
+Tags = ["material", "metal", "noble"]
+
+[[Dictionary]]
+Name = "oak"
+Tags = ["material", "large", "solid", "wood"]
+[[Dictionary]]
+Name = "pine"
+Tags = ["material", "large", "solid", "wood"]
+[[Dictionary]]
+Name = "walnut"
+Tags = ["material", "large", "solid", "wood"]
+[[Dictionary]]
+Name = "birch"
+Tags = ["material", "large", "solid", "wood"]
+
+
+[[Dictionary]]
+Name = "obsidian"
+Tags = ["material", "large", "solid", "stone", "battle"]
+[[Dictionary]]
+Name = "granite"
+Tags = ["material", "large", "solid", "stone"]
+[[Dictionary]]
+Name = "marble"
+Tags = ["material", "large", "solid", "stone"]
+[[Dictionary]]
+Name = "basalt"
+Tags = ["material", "large", "solid", "stone"]
+[[Dictionary]]
+Name = "quartzite"
+Tags = ["material", "large", "solid", "stone"]
+        
+[[Dictionary]]
+Name = "bone"
+Tags = ["material", "large", "solid", "animal product"]
+[[Dictionary]]
+Name = "ivory"
+Tags = ["material", "large", "solid", "animal product"]
+[[Dictionary]]
+Name = "wax"
+Tags = ["material", "large", "animal product"]
+[[Dictionary]]
+Name = "pearl"
+Tags = ["material", "solid", "animal product", "noble"]
+
+[[Dictionary]]
+Name = "horse"
+Tags = ["object", "animal", "noble"]
+[[Dictionary]]
+Name = "dog"
+Tags = ["object", "animal"]
+[[Dictionary]]
+Name = "cat"
+Tags = ["object", "animal"]
+[[Dictionary]]
+Name = "elephant"
+Tags = ["object", "animal"]
+[[Dictionary]]
+Name = "bird"
+Tags = ["object", "animal"]
+[[Dictionary]]
+Name = "fish"
+Tags = ["object", "animal"]
+[[Dictionary]]
+Name = "fortress"
+Tags = ["object"]
+[[Dictionary]]
+Name = "temple"
+Tags = ["object"]
+[[Dictionary]]
+Name = "waterwheel"
+Tags = ["object"]
+[[Dictionary]]
+Name = "lighthouse"
+Tags = ["object"]
+[[Dictionary]]
+Name = "tree"
+Tags = ["object"]
+[[Dictionary]]
+Name = "bush"
+Tags = ["object"]
+[[Dictionary]]
+Name = "plant"
+Tags = ["object"]
+
+[[Dictionary]]
+Name = "broad"
+Tags = ["sword type"]
+[[Dictionary]]
+Name = "curved"
+Tags = ["sword type"]
+[[Dictionary]]
+Name = "short"
+Tags = ["sword type"]
+[[Dictionary]]
+Name = "long"
+Tags = ["sword type"]
+
+[[Dictionary]]
+Name = "foreign text"
+Tags = ["inscription"]
+[[Dictionary]]
+Name = "epic battle"
+Tags = ["inscription"]
+[[Dictionary]]
+Name = "ceremony"
+Tags = ["inscription"]
+
+# Ordinary objects
+[[Items]]
+Name = "spoon"
+    # Always made of a material
+    [[Items.Modifiers]]
+    Prepend = "@ "
+    Tags = ["material&solid&large"]
+    Chance = 1.0
+    # 20% to be shaped like a building
+    [[Items.Modifiers]]
+    Append = " with a handle shaped like a @"
+    Tags = ["object"]
+    Chance = 0.2
+[[Items]]
+Name = "vase"
+    # Always made of a material
+    [[Items.Modifiers]]
+    Prepend = "@ "
+    Tags = ["material&solid&large"]
+    Chance = 1.0
+    # 50% to have a handle
+    [[Items.Modifiers]]
+    Append = " with a handle"
+    Tags = []
+    Chance = 0.5
+    # 20% to have an inscription
+    [[Items.Modifiers]]
+    Append = " with inscriptions of a @"
+    Tags = ["object|inscription"]
+    Chance = 0.2
+[[Items]]
+Name = "mug"
+    # Always made of a material
+    [[Items.Modifiers]]
+    Prepend = "@ "
+    Tags = ["material&solid&large"]
+    Chance = 1.0
+    # 5% to have an inscription
+    [[Items.Modifiers]]
+    Append = " with inscriptions of a @"
+    Tags = ["object|inscription"]
+    Chance = 0.05
+[[Items]]
+Name = "badge"
+    # Always has a shape
+    [[Items.Modifiers]]
+    Prepend = "@-shaped "
+    Tags = ["object"]
+    Chance = 1.0
+    # Always made of a material
+    [[Items.Modifiers]]
+    Prepend = "@ "
+    Tags = ["material&metal&solid"]
+    Chance = 1.0
+    # 10% to be extra special
+    [[Items.Modifiers]]
+    Append = " set with @"
+    Tags = ["material&noble"]
+    Chance = 0.1
+[[Items]]
+Name = "fishing hook"
+    # 10% to be treble (3 hooks)
+    [[Items.Modifiers]]
+    Prepend = "treble "
+    Tags = []
+    Chance = 0.1
+    # Always made of a material
+    [[Items.Modifiers]]
+    Prepend = "@ "
+    Tags = ["material&metal&solid"]
+    Chance = 1.0
+
+
+# Weapons & armour (todo)
+[[Items]]
+Name = "sword"
+    # 50% to be a specific type of sword
+    [[Items.Modifiers]]
+    Prepend = "@"
+    Tags = ["sword type"]
+    Chance = 0.5
+    # Always made of a battle material, more likley to be metal
+    [[Items.Modifiers]]
+    Prepend = "@ "
+    Tags = ["material&solid&large&metal&battle|material&solid&large&battle|material&solid&large&metal&noble"]
+    Chance = 1.0
+    # 20% for special guard
+    [[Items.Modifiers]]
+    Append = " with a @ @-shaped guard"
+    Tags = ["material&solid&large", "object"]
+    Chance = 0.2
+    # 20% for special pommel
+    [[Items.Modifiers]]
+    Append = " with a @ @-shaped pommel"
+    Tags = ["material&solid&large", "object"]
+    Chance = 0.2

@@ -1,6 +1,6 @@
-﻿namespace FantasyItemGenerator.Data
+﻿namespace FantasyItemGenerator.Model.Input
 {
-    public class Item
+    internal class Item
     {
         public string? Name { get; set; }
         public List<Modifier>? Modifiers { get; set; }
