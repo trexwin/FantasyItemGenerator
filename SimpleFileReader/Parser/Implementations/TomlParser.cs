@@ -26,51 +26,71 @@ namespace SimpleFileReader.Parser.Implementations
             while (file.Length > 0)
             {
                 char ch = file[0];
-                if (ch == '#')
+                if (ch == '"' || char.IsLetter(ch))
+                {
+                    var (key, val) = ReadKeyValuePair(ref file);
+                    result.TryAdd(key, val);
+                }
+                else if (ch == '[')
+                {
+                    if (file.Length >= 2 && file[1] == '[')
+                    { /* in list */  }
+                    else
+                    {
+                        var name = ReadKey(ref file);
+                        if (file.Length == 0 || file[0] != ']')
+                            throw new Exception($"Invalid object selection on line {_lines - file.Count('\n')}");
+
+                        var newObject = new ExpandoObject();
+                        result.TryAdd(name, newObject);
+                        // Add newObject to some sort of stack
+                    }
+                    throw new NotImplementedException();
+                }
+                else if (ch == '#')
                 {
                     file = ConsumeComment(file);
                 } 
                 else if (char.IsWhiteSpace(ch))
                 {
-                    file = ConsumeWhitespace(file);
-                }
-                else if (ch == '"' || char.IsLetter(ch))
-                {
-                    var key = ReadKey(ref file);
-
-                    file = ConsumeWhitespace(file);
-                    
-                    if(file.Length == 0 || file[0] != '=')
-                        throw new Exception($"Key value pair not properly specified at line {_lines - file.Count('\n')}.");
-                    else 
-                        file = file.Slice(1);
-                    
-                    file = ConsumeWhitespace(file);
-
-                    var val = ReadValue(ref file);
-
-                    result.TryAdd(key, val);
-                }
-                else if(ch == '[')
-                {
-                    // Create new object
-                    throw new NotImplementedException();
+                    file = ConsumeSpaces(file);
                 }
                 else
                 {
                     throw new Exception($"Could not read line {_lines - file.Count('\n')}.");
                 }
 
+                if (file.Length > 0 && file[0] != '\n')
+                    throw new Exception($"Improper ending of line {_lines - file.Count('\n')}.");
+                file = ConsumeWhitespace(file);
             }
-
             return result;
         }
 
+
+        protected (string, string) ReadKeyValuePair(ref ReadOnlySpan<char> file)
+        {
+            // ... = ...
+            var key = ReadKey(ref file);
+            file = ConsumeSpaces(file);
+            if (file.Length == 0 || file[0] != '=')
+                throw new Exception($"Key value pair not properly specified at line {_lines - file.Count('\n')}.");
+            else
+                file = file.Slice(1);
+
+            file = ConsumeSpaces(file);
+            var val = ReadValue(ref file);
+            file = ConsumeSpaces(file);
+
+            return (key, val);
+        }
+
         /// <summary>
-        /// Reads the provided file as if it starts with a key
+        /// Reads the provided file as if it starts with a key.
         /// </summary>
         /// <param name="file"></param>
         /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         protected string ReadKey(ref ReadOnlySpan<char> file)
         {
             if (file.Length == 0)
@@ -78,23 +98,15 @@ namespace SimpleFileReader.Parser.Implementations
 
             // "..." = ...
             if (file[0] == '"') 
-            {
-                // Consume till second '"'
-                file = file.Slice(1);
-                var i = file.IndexOf('"');
-                var key = file.Slice(0, i).ToString();
-                file = file.Slice(i);
-                return key;
-            }
+                return ReadString(ref file);
             // ... = ...
-            else
-            {
-                // Consume till whitespace
-                var i = Math.Min(file.IndexOf(' '), file.IndexOf('\t'));
-                var key = file.Slice(0, i).ToString();
-                file = file.Slice(i);
-                return key;
-            }
+            // Consume till whitespace, = or ]
+            var i = file.IndexOfAny([' ', '\t', '=', ']']);
+            var key = file.Slice(0, i).Trim().ToString();
+            if (key.Contains('\n'))
+                throw new Exception($"Key contains new line at line {_lines - file.Count('\n')}.");
+            file = file.Slice(i);
+            return key;
         }
 
         /// <summary>
@@ -107,26 +119,73 @@ namespace SimpleFileReader.Parser.Implementations
             if (file.Length == 0)
                 return string.Empty;
 
-            // Array
+            string res;
             if (file[0] == '[')
             {
-                // Consume till second '"'
+                // Consume till second ']'
                 file = file.Slice(1);
-                var i = file.IndexOf(']');
-                var val = file.Slice(0, i).ToString();
-                file = file.Slice(i);
-                return val;
+                res = "[";
+                while (file[0] != ']')
+                {
+                    file = ConsumeWhitespace(file);
+                    res += ReadValue(ref file);
+                    file = ConsumeWhitespace(file);
+                    if (file[0] == ',')
+                    {
+                        file = file.Slice(1);
+                        res += ",";
+                    }
+                }
+                file = file.Slice(1);
+                res += "]";
             }
-            // Any other value
+            else if (file[0] == '"')
+            {
+                res = '"' + ReadString(ref file) + '"';
+            }
             else
             {
-                // Consume till newline
-                var i = file.IndexOf('\n');
-                var val = file.Slice(0, i).ToString();
-                file = file.Slice(i);
-                return val;
+                // Read till next whitespace
+                for(res = string.Empty; !char.IsWhiteSpace(file[0]); file = file.Slice(1))
+                    res += file[0];
             }
+
+            return res;
         }
+
+        /// <summary>
+        /// Reads a string between two quotation marks.
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns>The read string or an empty string if no opening quotation mark was found.</returns>
+        /// <exception cref="Exception"></exception>
+        protected string ReadString(ref ReadOnlySpan<char> file)
+        {
+            if (file[0] == '"')
+            {
+                var tmpFile = file.Slice(1);
+                while (tmpFile.Length > 0)
+                {
+                    if (tmpFile[0] == '"')
+                    {
+                        // Extract string
+                        var val = file.Slice(0, file.Length - tmpFile.Length).ToString();
+                        file = tmpFile.Slice(1);
+                        return val;
+                    }
+                    else if (tmpFile[0] == '\n')
+                        break;
+                    else if (tmpFile[0] == '\\' && tmpFile.Length >= 2)
+                        tmpFile = tmpFile.Slice(2);
+                    else
+                        tmpFile = tmpFile.Slice(1);
+                }
+                throw new Exception($"Could not read string at line {_lines - file.Count('\n')}.");
+            }
+            return string.Empty;
+        }
+
+
 
         /// <summary>
         /// Consume characters till we encounter a new line
@@ -146,5 +205,17 @@ namespace SimpleFileReader.Parser.Implementations
         /// <returns></returns>
         protected ReadOnlySpan<char> ConsumeWhitespace(ReadOnlySpan<char> file)
             => file.TrimStart();
+
+        /// <summary>
+        /// Similair to ConsumeWhitespace, but does not consume new lines
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns></returns>
+        protected ReadOnlySpan<char> ConsumeSpaces(ReadOnlySpan<char> file)
+        {
+            while (file.Length > 0 && (file[0] == ' ' || file[0] == '\t'))
+                file = file.Slice(1);
+            return file;
+        }
     }
 }
