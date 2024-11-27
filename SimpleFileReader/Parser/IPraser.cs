@@ -15,6 +15,6 @@ namespace SimpleFileReader.Parser
         /// </summary>
         /// <param name="filecontent"></param>
         /// <returns></returns>
-        public dynamic Parse(string filecontent);
+        public Dictionary<string, object> Parse(string filecontent);
     }
 }

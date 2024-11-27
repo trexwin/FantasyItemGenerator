@@ -1,0 +1,16 @@
+txt = "test \"text\""
+integer = 12345
+int_array = [1,2,3,4,5]
+string_array = ["a","b","c","d","e"]
+multiline_array= [
+	"a",
+	"b",
+	"c",
+	"d",
+	"\""
+	]
+double = 12.2
+[testa]
+txt = "more test text"
+[testb]
+txt = "even more test text"

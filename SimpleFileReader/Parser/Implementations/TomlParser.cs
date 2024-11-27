@@ -7,45 +7,58 @@ namespace SimpleFileReader.Parser.Implementations
     {
         private int _lines = 0;
 
-        public override dynamic Parse(string filecontent)
+        public override Dictionary<string, object> Parse(string filecontent)
         {
-            var res = new ExpandoObject();
             ReadOnlySpan<char> file = filecontent.AsSpan();
-            _lines = file.Count('\n');
+            _lines = file.Count('\n') + 1;
             
-            return ReadFile(res, file);
+            return ReadObject(string.Empty, ref file);
         }
 
         /// <summary>
-        /// Functaionally reads the given input file character by character into an ExpandoObject
+        /// Functaionally reads the given input file into a dictionary
         /// </summary>
-        /// <param name="result"></param>
         /// <param name="file"></param>
-        protected dynamic ReadFile(ExpandoObject result, ReadOnlySpan<char> file)
+        protected Dictionary<string, object> ReadObject(string level, ref ReadOnlySpan<char> file)
         {
+            var res = new Dictionary<string, object>();
             while (file.Length > 0)
             {
                 char ch = file[0];
                 if (ch == '"' || char.IsLetter(ch))
                 {
                     var (key, val) = ReadKeyValuePair(ref file);
-                    result.TryAdd(key, val);
+                    res.TryAdd(key, val);
                 }
                 else if (ch == '[')
                 {
-                    if (file.Length >= 2 && file[1] == '[')
-                    { /* in list */  }
+                    file = file.Slice(1);
+                    if (file.Length > 0 && file[0] == '[')
+                    {
+                        // in list
+                        throw new NotImplementedException();
+                    }
                     else
                     {
+                        // Should not consume if not subobject
+                        // ToDo: Fix
                         var name = ReadKey(ref file);
                         if (file.Length == 0 || file[0] != ']')
                             throw new Exception($"Invalid object selection on line {_lines - file.Count('\n')}");
+                        file = file.Slice(1);
 
-                        var newObject = new ExpandoObject();
-                        result.TryAdd(name, newObject);
-                        // Add newObject to some sort of stack
+                        // Subobject
+                        // ToDo: More intelligent selection, current testa is sub of test
+                        if (name.StartsWith(level))
+                        {
+                            var newObject = ReadObject(name, ref file);
+                            res.TryAdd(name, newObject);
+                            // New line already consumed
+                            continue;
+                        }
+                        else
+                            return res;
                     }
-                    throw new NotImplementedException();
                 }
                 else if (ch == '#')
                 {
@@ -60,11 +73,18 @@ namespace SimpleFileReader.Parser.Implementations
                     throw new Exception($"Could not read line {_lines - file.Count('\n')}.");
                 }
 
-                if (file.Length > 0 && file[0] != '\n')
+                if(file.Length == 0 ||
+                   (file.Length > 0 && file[0] == '\n') ||
+                   (file.Length >= 1 && file[0] == '\r' && file[1] == '\n'))
+                {
+                    file = ConsumeWhitespace(file);
+                }
+                else
+                {
                     throw new Exception($"Improper ending of line {_lines - file.Count('\n')}.");
-                file = ConsumeWhitespace(file);
+                }
             }
-            return result;
+            return res;
         }
 
 
@@ -138,6 +158,7 @@ namespace SimpleFileReader.Parser.Implementations
                 }
                 file = file.Slice(1);
                 res += "]";
+                Console.WriteLine(res);
             }
             else if (file[0] == '"')
             {
@@ -145,9 +166,13 @@ namespace SimpleFileReader.Parser.Implementations
             }
             else
             {
-                // Read till next whitespace
-                for(res = string.Empty; !char.IsWhiteSpace(file[0]); file = file.Slice(1))
+                // Read till next non letter or digit
+                for(res = string.Empty; 
+                    file.Length > 0 && (char.IsLetterOrDigit(file[0]) || file[0] == '.'); 
+                    file = file.Slice(1))
+                {
                     res += file[0];
+                }
             }
 
             return res;
@@ -169,7 +194,7 @@ namespace SimpleFileReader.Parser.Implementations
                     if (tmpFile[0] == '"')
                     {
                         // Extract string
-                        var val = file.Slice(0, file.Length - tmpFile.Length).ToString();
+                        var val = file.Slice(1, file.Length - tmpFile.Length - 1).ToString();
                         file = tmpFile.Slice(1);
                         return val;
                     }
@@ -184,8 +209,6 @@ namespace SimpleFileReader.Parser.Implementations
             }
             return string.Empty;
         }
-
-
 
         /// <summary>
         /// Consume characters till we encounter a new line
