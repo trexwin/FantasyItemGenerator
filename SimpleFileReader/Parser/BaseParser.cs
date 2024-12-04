@@ -1,7 +1,7 @@
 ﻿
 namespace SimpleFileReader.Parser
 {
-    public abstract class BaseParser : IPraser
+    public abstract class BaseParser : IParser
     {
         public string Load(string filepath)
         {

@@ -1,7 +1,7 @@
 ﻿
 namespace SimpleFileReader.Parser
 {
-    public interface IPraser
+    public interface IParser
     {
         /// <summary>
         /// Retrieve the contents of the given path as a string.

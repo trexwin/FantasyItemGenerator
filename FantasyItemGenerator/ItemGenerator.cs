@@ -2,7 +2,6 @@ using FantasyItemGenerator.Model;
 using FantasyItemGenerator.Model.Input;
 using FantasyItemGenerator.Transform;
 using SimpleFileReader;
-using System;
 
 namespace FantasyItemGenerator
 {
@@ -21,7 +20,7 @@ namespace FantasyItemGenerator
         }
 
         public string[] GetExampleFiles()
-            => Directory.GetFiles(Path.Combine(Environment.CurrentDirectory, @"Examples"), "*.*", SearchOption.TopDirectoryOnly);
+            => Directory.GetFiles(Path.Combine(Environment.CurrentDirectory, "Examples"), "*.*", SearchOption.TopDirectoryOnly);
 
         public string[]? GenerateItem(int amount)
         {

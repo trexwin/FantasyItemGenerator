@@ -10,7 +10,22 @@ multiline_array= [
 	"\""
 	]
 double = 12.2
-[testa]
+
+nested.a = 2
+nested.b = "test"
+
+[test]
 txt = "more test text"
-[testb]
+[testa]
 txt = "even more test text"
+[testa.blorp]
+txt = "very nested text"
+
+[[testc]]
+txt = "text1"
+[[testc]]
+txt = "text2"
+[testc.mem]
+num = 2
+[[testc]]
+txt = "text3"
