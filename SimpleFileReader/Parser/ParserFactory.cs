@@ -8,8 +8,13 @@ namespace SimpleFileReader.Parser
         public ParserFactory() 
         {
             _parsers = new Dictionary<string, IParser>();
-            var path = Path.Combine(Environment.CurrentDirectory, "Implementations");
-            var assembly = Assembly.LoadFile(path);
+
+            // Retrieve associated assembly
+            var assembly = Assembly.GetAssembly(typeof(IParser));
+
+            if (assembly == null)
+                throw new Exception($"Could not locate assembly of \"{typeof(IParser).Name}\"");
+
             foreach(var type in assembly.GetTypes())
             {
                 // Ignore if not a parser
@@ -28,7 +33,7 @@ namespace SimpleFileReader.Parser
             }
         }
 
-        public IParser GetParser(string extension)
-            => throw new NotImplementedException();
+        public IParser? GetParser(string extension)
+            => _parsers.ContainsKey(extension) ? _parsers[extension] : null;
     }
 }

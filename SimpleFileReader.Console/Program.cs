@@ -1,12 +1,13 @@
 ﻿using FantasyItemGenerator;
 using SimpleFileReader.Parser.Implementations;
 
-
+/*
 var toml = new TomlParser();
 var x = toml.LoadAndParse(Path.Combine(Environment.CurrentDirectory, @"testfile.toml"));
 
 
 return;
+*/
 
 
 

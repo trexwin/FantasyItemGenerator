@@ -7,7 +7,6 @@ namespace FantasyItemGenerator.Transform
     {
         public List<SimpleItem> Transform(Settings input)
         {
-            input.ValidateSettings();
             var itemTransformer = new ItemTransformer(input.Dictionary);
             return input.Items.Select(itemTransformer.Transform).ToList();
         }

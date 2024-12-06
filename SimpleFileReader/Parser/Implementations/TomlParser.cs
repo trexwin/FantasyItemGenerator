@@ -1,6 +1,4 @@
-﻿using SimpleFileReader.DataParsers.Implementations;
-using SimpleFileReader.Helper;
-using System.Dynamic;
+﻿using SimpleFileReader.Helper;
 
 namespace SimpleFileReader.Parser.Implementations
 {
@@ -31,27 +29,32 @@ namespace SimpleFileReader.Parser.Implementations
                 if (ch == '"' || char.IsLetter(ch))
                 {
                     var (keys, val) = ReadKeysValuePair(ref file);
-                    var tmp = res;
-                    for(int i = 0; i < keys.Length - 1; i++)
+                    if (val != null)
                     {
-                        object? nestedObject;
-                        if(tmp.TryGetValue(keys[i], out nestedObject) && nestedObject is Dictionary<string, object>)
+                        // If nested selection
+                        var tmp = res;
+                        for (int i = 0; i < keys.Length - 1; i++)
                         {
-                            tmp = (Dictionary<string, object>)nestedObject;
+                            object? nestedObject;
+                            if (tmp.TryGetValue(keys[i], out nestedObject) && nestedObject is Dictionary<string, object>)
+                            {
+                                tmp = (Dictionary<string, object>)nestedObject;
+                            }
+                            else
+                            {
+                                nestedObject = new Dictionary<string, object>();
+                                tmp.Add(keys[i], nestedObject);
+                                tmp = (Dictionary<string, object>)nestedObject;
+                            }
                         }
-                        else
-                        {
-                            nestedObject = new Dictionary<string, object>();
-                            tmp.Add(keys[i], nestedObject);
-                            tmp = (Dictionary<string, object>)nestedObject;
-                        }
+                        tmp.TryAdd(keys.Last(), val);
                     }
-                    tmp.TryAdd(keys.Last(), val);
                 }
                 // List or Object
                 else if(ch == '[')
                 {
                     var oldFile = file;
+                    // List
                     if (file.Length > 1 && file[1] == '[')
                     {
                         var name = ReadListKeys(ref file);
@@ -59,19 +62,20 @@ namespace SimpleFileReader.Parser.Implementations
                         {
                             object? listObject;
                             var newObject = ReadObject(name, ref file);
-                            if (res.TryGetValue(name.Last(), out listObject) && listObject is List<object>)
+                            if (res.TryGetValue(name.Last(), out listObject) && listObject is List<object?>)
                             {
-                                List<object> list = (List<object>)listObject;
+                                var list = (List<object?>)listObject;
                                 list.Add(newObject);
                             }
                             else
                             {
-                                listObject = new List<object>() { newObject };
+                                listObject = new List<object?>() { newObject };
                                 res.TryAdd(name.Last(), listObject);
                             }
                             continue;
                         }
                     }
+                    // Object
                     else
                     {
                         var name = ReadObjectKeys(ref file);
@@ -107,7 +111,7 @@ namespace SimpleFileReader.Parser.Implementations
         }
 
 
-        protected (string[], string) ReadKeysValuePair(ref ReadOnlySpan<char> file)
+        protected (string[], object?) ReadKeysValuePair(ref ReadOnlySpan<char> file)
         {
             // ... = ...
             var keys = ReadKeys(ref file);
@@ -210,48 +214,43 @@ namespace SimpleFileReader.Parser.Implementations
         /// </summary>
         /// <param name="file"></param>
         /// <returns></returns>
-        protected string ReadValue(ref ReadOnlySpan<char> file)
+        protected object? ReadValue(ref ReadOnlySpan<char> file)
         {
             if (file.Length == 0)
-                return string.Empty;
+                return null;
 
-            string res;
             if (file[0] == '[')
             {
                 // Consume till second ']'
                 file = file.Slice(1);
-                res = "[";
+                var res = new List<object?>();
                 while (file[0] != ']')
                 {
                     file = ConsumeWhitespace(file);
-                    res += ReadValue(ref file);
+                    res.Add(ReadValue(ref file));
                     file = ConsumeWhitespace(file);
                     if (file[0] == ',')
-                    {
                         file = file.Slice(1);
-                        res += ",";
-                    }
                 }
                 file = file.Slice(1);
-                res += "]";
-                Console.WriteLine(res);
+                return res;
             }
             else if (file[0] == '"')
             {
-                res = '"' + ReadString(ref file) + '"';
+                return ReadString(ref file);
             }
             else
             {
                 // Read till next non letter or digit
+                string res;
                 for(res = string.Empty; 
                     file.Length > 0 && (char.IsLetterOrDigit(file[0]) || file[0] == '.'); 
                     file = file.Slice(1))
                 {
                     res += file[0];
                 }
+                return res;
             }
-
-            return res;
         }
 
         /// <summary>
