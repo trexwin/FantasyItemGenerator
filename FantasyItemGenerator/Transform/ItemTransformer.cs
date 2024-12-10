@@ -7,13 +7,13 @@ namespace FantasyItemGenerator.Transform
     {
         private ModifierTransformer _modifierTransformer;
 
-        public ItemTransformer(List<Word> dictionary)
+        public ItemTransformer(Word[] dictionary)
             => _modifierTransformer = new ModifierTransformer(dictionary);
 
         public SimpleItem Transform(Item input)
         {
-            string name = input.Name ?? string.Empty;
-            var parsedModifiers = input.Modifiers?.Select(_modifierTransformer.Transform).ToArray() ?? [];
+            string name = input.Name;
+            var parsedModifiers = input.Modifiers.Select(_modifierTransformer.Transform).ToArray();
             return new SimpleItem(name, parsedModifiers);
         }
     }

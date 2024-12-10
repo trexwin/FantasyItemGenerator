@@ -2,7 +2,7 @@
 {
     internal class Item
     {
-        public string? Name { get; set; }
-        public List<Modifier>? Modifiers { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public Modifier[] Modifiers { get; set; } = [];
     }
 }

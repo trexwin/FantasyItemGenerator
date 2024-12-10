@@ -5,9 +5,9 @@ namespace FantasyItemGenerator.Transform
 {
     internal class ModifierTransformer : ITransformer<Modifier, SimpleModifier>
     {
-        private List<Word> _dictionary;
+        private Word[] _dictionary;
 
-        public ModifierTransformer(List<Word> dictionary) 
+        public ModifierTransformer(Word[] dictionary) 
             => _dictionary = dictionary;
 
         public SimpleModifier Transform(Modifier input)

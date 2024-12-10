@@ -2,7 +2,6 @@ using FantasyItemGenerator.Model;
 using FantasyItemGenerator.Model.Input;
 using FantasyItemGenerator.Transform;
 using SimpleFileReader;
-using System;
 
 namespace FantasyItemGenerator
 {
@@ -10,18 +9,18 @@ namespace FantasyItemGenerator
     {
         private Random _random;
         private List<SimpleItem>? _items;
-        private FileReaderFactory _readerFactory;
+        private FileReader<Settings> _fileReader;
         private SettingsTransformer _settingsTransformer;
 
         public ItemGenerator()
         {
             _random = new Random();
-            _readerFactory = new FileReaderFactory();
             _settingsTransformer = new SettingsTransformer();
+            _fileReader = new FileReader<Settings>();
         }
 
         public string[] GetExampleFiles()
-            => Directory.GetFiles(Path.Combine(Environment.CurrentDirectory, @"Examples"), "*.*", SearchOption.TopDirectoryOnly);
+            => Directory.GetFiles(Path.Combine(Environment.CurrentDirectory, "Examples"), "*.*", SearchOption.TopDirectoryOnly);
 
         public string[]? GenerateItem(int amount)
         {
@@ -68,8 +67,7 @@ namespace FantasyItemGenerator
 
             // Load new settings
             var extension = Path.GetExtension(path);
-            var reader = _readerFactory.GetFileReader<Settings>(extension);
-            var settings = reader.ReadFile(path);
+            var settings = _fileReader.ReadFile(path);
 
             // Parse new settings
             _items = _settingsTransformer.Transform(settings);
