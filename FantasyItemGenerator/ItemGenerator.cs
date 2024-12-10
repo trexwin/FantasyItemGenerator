@@ -9,12 +9,14 @@ namespace FantasyItemGenerator
     {
         private Random _random;
         private List<SimpleItem>? _items;
+        private FileReader<Settings> _fileReader;
         private SettingsTransformer _settingsTransformer;
 
         public ItemGenerator()
         {
             _random = new Random();
             _settingsTransformer = new SettingsTransformer();
+            _fileReader = new FileReader<Settings>();
         }
 
         public string[] GetExampleFiles()
@@ -65,8 +67,7 @@ namespace FantasyItemGenerator
 
             // Load new settings
             var extension = Path.GetExtension(path);
-            var filereader = new FileReader<Settings>();
-            var settings = filereader.ReadFile(path);
+            var settings = _fileReader.ReadFile(path);
 
             // Parse new settings
             _items = _settingsTransformer.Transform(settings);

@@ -8,16 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="testfile.toml" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="testfile.toml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\FantasyItemGenerator\FantasyItemGenerator.csproj" />
     <ProjectReference Include="..\SimpleFileReader\SimpleFileReader.csproj" />
   </ItemGroup>

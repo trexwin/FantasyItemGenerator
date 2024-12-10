@@ -13,9 +13,7 @@ namespace SimpleFileReader
         private ParserFactory _factory;
 
         public FileReader()
-        {
-            _factory = new ParserFactory();
-        }
+            => _factory = new ParserFactory();
 
         public T ReadFile(string path)
         {
@@ -80,7 +78,6 @@ namespace SimpleFileReader
 
         protected object ConvertString(Type target, string name, string input)
         {
-            // Use TryParse
             if (target == typeof(string))
                 return input;
             else if (target == typeof(int))
@@ -88,11 +85,8 @@ namespace SimpleFileReader
             else if (target == typeof(double))
                 return double.Parse(input);
             else
-                throw new NotImplementedException($"Key \"{name}\" is of type \"{target.Name}\" which has no conversion.");
+                throw new NotImplementedException($"No conversion for type \"{target.Name}\" on key \"{name}\".");
         }
-
-        private void ThrowInvalidValue(string key, Type type)
-            => throw new Exception($"The key \"{key}\" has an invalid value, expected type \"{type.Name}\"");
 
         protected object CreateInstance(Type type)
             => type.GetConstructor([])?.Invoke([]) 
