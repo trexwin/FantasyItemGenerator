@@ -8,7 +8,7 @@ namespace FantasyItemGenerator.Transform
         {
             var requirements = input.Split('|').Select(t => t.Split('&'));
             // If any of the tag arrays are empty after except, an array is a subset of word.Tags
-            return (word) => requirements.Any(tags => !tags.Except(word.Tags ?? []).Any());
+            return (word) => requirements.Any(tags => !tags.Except(word.Tags).Any());
         }
     }
 }
